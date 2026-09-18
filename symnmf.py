@@ -1,9 +1,17 @@
 import sys
 import numpy as np
 import symnmfmodule
+np.random.seed(1234)
 
 ERROR_MSG = "An Error Has Occurred"
 
+def is_int(s):
+    try:
+        x = float(s)
+    except ValueError:
+        return False
+
+    return x.is_integer()
 
 def read_input(file_name):
     try:
@@ -27,8 +35,6 @@ def initialize_h(w, k):
     n = len(w)
     m = np.mean(w)
     upper_bound = 2 * np.sqrt(m / k)
-
-    np.random.seed(1234)
 
     return np.random.uniform(
         0,
@@ -60,11 +66,11 @@ def main():
         print(ERROR_MSG)
         return 1
 
-    try:
-        k = int(sys.argv[1])
-    except ValueError:
+    if not is_int(sys.argv[1]):
         print("Incorrect number of clusters!")
         return 1
+
+    k = int(float(sys.argv[1]))
     
     goal = sys.argv[2]
     file_name = sys.argv[3]

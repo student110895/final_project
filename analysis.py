@@ -57,6 +57,22 @@ def read_data(file_name):
     except Exception:
         error()
 
+
+def get_symnmf_labels(points, k):
+    n = len(points)
+    np.random.seed(1234)
+
+    W = symnmfmodule.norm(points)
+    m = np.mean(W)
+    upper_bound = 2 * np.sqrt(m / k)
+
+    H_init = np.random.uniform(
+        0, upper_bound, (n, k)
+    ).tolist()
+
+    H_final = symnmfmodule.symnmf(H_init, W)
+
+    return [np.argmax(row) for row in H_final]
 # --- Main Analysis Flow ---
 
 def main():
@@ -83,22 +99,10 @@ def main():
         error()
 
     # 3. Run SymNMF Clustering
-    np.random.seed(1234)
     try:
-        W = symnmfmodule.norm(X)
-        
-        # Initialize H based on the W matrix average
-        m = np.mean(W)
-        upper_bound = 2 * np.sqrt(m / k)
-        H_init = np.random.uniform(0, upper_bound, (n, k)).tolist()
-        
-        # Run SymNMF C extension
-        H_final = symnmfmodule.symnmf(H_init, W)
-        
-        # Derive hard clustering by choosing the highest association score per row
-        nmf_labels = [np.argmax(row) for row in H_final]
+        nmf_labels = get_symnmf_labels(X, k)
     except Exception:
-        error()
+        error()    
 
     # 4. Compare and Output Results
     try:

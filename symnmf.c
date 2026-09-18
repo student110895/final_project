@@ -8,7 +8,7 @@
 #define BETA 0.5
 #define EPSILON 0.0001
 #define MAX_ITER 300
-
+#define DENOM_EPSILON 0.000001
 
 double **allocate_matrix(int rows, int cols)
 {
@@ -369,13 +369,11 @@ static double **update_h(double **H, double **W, int n, int k)
 
     for (i = 0; i < n; i++) {
         for (j = 0; j < k; j++) {
-            if (denominator[i][j] == 0.0)
-                next[i][j] = 0.0;
-            else
-                next[i][j] =
-                    H[i][j] *
-                    ((1.0 - BETA) +
-                     BETA * WH[i][j] / denominator[i][j]);
+            next[i][j] =
+                H[i][j] *
+                ((1.0 - BETA) +
+                BETA * WH[i][j] /
+                (denominator[i][j] + DENOM_EPSILON));
         }
     }
 
