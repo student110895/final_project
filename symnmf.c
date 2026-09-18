@@ -72,21 +72,17 @@ static double **copy_matrix(double **matrix, int rows, int cols)
 static int get_dimensions(FILE *file, int *n, int *d)
 {
     int c;
-    int commas;
-    int lines;
-    int first_line;
-    int last;
-
-    commas = 0;
-    lines = 0;
-    first_line = 1;
-    last = '\n';
+    int commas = 0;
+    int lines = 0;
+    int first_line = 1;
+    int last = '\n';
 
     while ((c = fgetc(file)) != EOF) {
         if (first_line && c == ',')
             commas++;
 
-        if (c == '\n') {
+        /* Only increment line count if the line actually contains data */
+        if (c == '\n' && last != '\n') {
             lines++;
             first_line = 0;
         }
@@ -94,6 +90,7 @@ static int get_dimensions(FILE *file, int *n, int *d)
         last = c;
     }
 
+    /* Account for a file that doesn't end with a newline */
     if (last != '\n')
         lines++;
 

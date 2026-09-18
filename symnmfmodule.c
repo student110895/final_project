@@ -203,6 +203,13 @@ static PyObject *py_symnmf(PyObject *self, PyObject *args)
         free_matrix(H, n);
         return NULL;
     }
+    
+    if (w_rows != n || w_cols != n) {
+        free_matrix(H, n);
+        free_matrix(W, w_rows);
+        PyErr_SetString(PyExc_RuntimeError, "An Error Has Occurred");
+        return NULL;
+    }
 
     result = symnmf(H, W, n, k);
 
