@@ -63,7 +63,7 @@ def main():
     try:
         k = int(sys.argv[1])
     except ValueError:
-        print(ERROR_MSG)
+        print("Incorrect number of clusters!")
         return 1
     
     goal = sys.argv[2]
