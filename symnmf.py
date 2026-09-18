@@ -65,7 +65,7 @@ def main():
     except ValueError:
         print(ERROR_MSG)
         return 1
-
+    
     goal = sys.argv[2]
     file_name = sys.argv[3]
 
@@ -78,8 +78,8 @@ def main():
     if points is None:
         return 1
 
-    if k < 1 or k >= len(points):
-        print(ERROR_MSG)
+    if k <=1 or k >= len(points):
+        print("Incorrect number of clusters!")
         return 1
 
     try:
