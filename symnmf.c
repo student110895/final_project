@@ -2,8 +2,10 @@
 #include <stdlib.h>
 #include <string.h>
 #include <math.h>
+#include "symnmf.h"
 
 #define ERROR_MSG "An Error Has Occurred"
+
 
 double **allocate_matrix(int rows, int cols)
 {
@@ -23,6 +25,7 @@ double **allocate_matrix(int rows, int cols)
     return mat;
 }
 
+
 void free_matrix(double **mat, int rows)
 {
     int i;
@@ -32,6 +35,7 @@ void free_matrix(double **mat, int rows)
 
     free(mat);
 }
+
 
 void get_dimensions(FILE *file, int *n, int *d)
 {
@@ -61,12 +65,12 @@ void get_dimensions(FILE *file, int *n, int *d)
     rewind(file);
 }
 
+
 double **read_points(FILE *file, int n, int d)
 {
     double **points;
     int i;
     int j;
-    int separator;
 
     points = allocate_matrix(n, d);
 
@@ -75,12 +79,13 @@ double **read_points(FILE *file, int n, int d)
             fscanf(file, "%lf", &points[i][j]);
 
             if (j < d - 1)
-                separator = fgetc(file);
+                fgetc(file);
         }
     }
 
     return points;
 }
+
 
 double squared_distance(double *x, double *y, int d)
 {
@@ -95,6 +100,7 @@ double squared_distance(double *x, double *y, int d)
 
     return sum;
 }
+
 
 double **sym(double **points, int n, int d)
 {
@@ -117,6 +123,36 @@ double **sym(double **points, int n, int d)
     return A;
 }
 
+
+double **ddg(double **points, int n, int d)
+{
+    double **A;
+    double **D;
+    double sum;
+    int i;
+    int j;
+
+    A = sym(points, n, d);
+    D = allocate_matrix(n, n);
+
+    for (i = 0; i < n; i++) {
+        sum = 0.0;
+
+        for (j = 0; j < n; j++)
+            sum += A[i][j];
+
+        for (j = 0; j < n; j++)
+            D[i][j] = 0.0;
+
+        D[i][i] = sum;
+    }
+
+    free_matrix(A, n);
+
+    return D;
+}
+
+
 void print_matrix(double **mat, int rows, int cols)
 {
     int i;
@@ -134,15 +170,22 @@ void print_matrix(double **mat, int rows, int cols)
     }
 }
 
+
 int main(int argc, char **argv)
 {
     FILE *file;
     double **points;
-    double **A;
+    double **result;
     int n;
     int d;
 
-    if (argc != 3 || strcmp(argv[1], "sym") != 0) {
+    if (argc != 3) {
+        printf("%s\n", ERROR_MSG);
+        return 1;
+    }
+
+    if (strcmp(argv[1], "sym") != 0 &&
+        strcmp(argv[1], "ddg") != 0) {
         printf("%s\n", ERROR_MSG);
         return 1;
     }
@@ -158,10 +201,14 @@ int main(int argc, char **argv)
     points = read_points(file, n, d);
     fclose(file);
 
-    A = sym(points, n, d);
-    print_matrix(A, n, n);
+    if (strcmp(argv[1], "sym") == 0)
+        result = sym(points, n, d);
+    else
+        result = ddg(points, n, d);
 
-    free_matrix(A, n);
+    print_matrix(result, n, n);
+
+    free_matrix(result, n);
     free_matrix(points, n);
 
     return 0;
