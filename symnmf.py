@@ -1,10 +1,12 @@
 import sys
 import numpy as np
 import symnmfmodule
+
 np.random.seed(1234)
 
 ERROR_MSG = "An Error Has Occurred"
 
+# Returns True if s represents a whole-number value, such as "3" or "3.0".
 def is_int(s):
     try:
         x = float(s)
@@ -13,6 +15,7 @@ def is_int(s):
 
     return x.is_integer()
 
+# Reads comma-separated data points from file_name and returns them as a list of lists.
 def read_input(file_name):
     try:
         with open(file_name, "r") as f:
@@ -25,24 +28,23 @@ def read_input(file_name):
         print(ERROR_MSG)
         return None
 
-
+# Prints a matrix with comma-separated entries rounded to four decimal places.
 def print_matrix(matrix):
     for row in matrix:
         print(",".join("%.4f" % value for value in row))
 
-
+# Initializes the n-by-k matrix H randomly using the required bound based on mean(W).
 def initialize_h(w, k):
     n = len(w)
     m = np.mean(w)
     upper_bound = 2 * np.sqrt(m / k)
-
     return np.random.uniform(
         0,
         upper_bound,
         (n, k)
     ).tolist()
 
-
+# Executes the requested goal using the C extension and returns the resulting matrix.
 def run_goal(points, k, goal):
     if goal == "sym":
         return symnmfmodule.sym(points)
@@ -60,7 +62,7 @@ def run_goal(points, k, goal):
 
     return None
 
-
+# Validates command-line arguments, runs the requested goal, and prints its result.
 def main():
     if len(sys.argv) != 4:
         print(ERROR_MSG)
